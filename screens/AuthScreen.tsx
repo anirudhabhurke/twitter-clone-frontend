@@ -9,9 +9,11 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 const authScreen: FC = (props: any) => {
       return (
             <BackgroundContainer style={styles.container}>
-                  <AntDesign name={'twitter'} size={35} color={Colors.white} style={styles.logoIcon}></AntDesign>
-                  <Text style={styles.header}>See what's happening in the world right now</Text>
-                  <Text style={styles.subHeading}>Join Twitter Today</Text>
+                  <View>
+                        <AntDesign name={'twitter'} size={35} color={Colors.white} style={styles.logoIcon}></AntDesign>
+                        <Text style={styles.header}>See what's happening in the world right now</Text>
+                        <Text style={styles.subHeading}>Join Twitter Today</Text>
+                  </View>
                   <View style={styles.buttonView}>
                         <Button
                               title={'Signup'}
@@ -33,6 +35,7 @@ const authScreen: FC = (props: any) => {
 const styles = StyleSheet.create({
       container: {
             flex: 1,
+            justifyContent: 'space-between'
       },
       logoIcon: {
             marginTop: hp(10),
@@ -50,9 +53,8 @@ const styles = StyleSheet.create({
             marginVertical: hp(2),
       },
       buttonView: {
-            bottom: hp(5),
             width: '100%',
-            position: 'absolute',
+            alignItems: 'center'
       },
       actionButton: {
             width: wp(80),
