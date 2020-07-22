@@ -1,0 +1,31 @@
+{
+      "expo": {
+            "name": "twitter",
+            "slug": "twitter",
+            "version": "1.0.0",
+            "orientation": "portrait",
+            "privacy": "hidden",
+            "icon": "./assets/icon.png",
+            "backgroundColor": "#14171A",
+
+            "splash": {
+                  "image": "./assets/splash.png",
+                  "resizeMode": "contain",
+                  "backgroundColor": "#ffffff"
+            },
+            "updates": {
+                  "fallbackToCacheTimeout": 0
+            },
+            "assetBundlePatterns": ["**/*"],
+            "ios": {
+                  "supportsTablet": true
+            },
+            "web": {
+                  "favicon": "./assets/favicon.png"
+            },
+            "androidNavigationBar": {
+                  "backgroundColor": "#14171A",
+                  "barStyle": "light-content"
+            }
+      }
+}
