@@ -1,15 +1,38 @@
 import React, { useState, FC } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, ToastAndroid } from 'react-native';
 import { BackgroundContainer } from '../../components/containers';
 import { Button, Text, TextInput } from '../../components';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import axios from '../../axios';
+import AsyncStorage from '@react-native-community/async-storage';
+import { connect } from 'react-redux';
 
 const loginScreen: FC = (props: any) => {
       const [emailState, setEmailState] = useState('');
       const [passwordState, setPasswordState] = useState('');
       const [showSpinnerState, setShowSpinnerState] = useState(false);
 
-      const loginUser = (email: string, password: string) => {};
+      const loginUser = (email: string, password: string) => {
+            if (email.replace(/\s/g, '').length && password) {
+                  const user = {
+                        email: emailState,
+                        password: passwordState,
+                  };
+                  axios.post('/user/login', user).then((response) => {
+                        if (response.data.error) {
+                              ToastAndroid.show(response.data.error, ToastAndroid.SHORT);
+                        } else if (response.data.message === 'Successful login') {
+                              ToastAndroid.show(response.data.message, ToastAndroid.SHORT);
+                              props.setToken(response.data.token);
+                              AsyncStorage.setItem('token', response.data.token, (error) => {
+                                    if (!error) {
+                                          props.navigation.replace('HomeNav');
+                                    }
+                              });
+                        }
+                  });
+            }
+      };
 
       return (
             <BackgroundContainer style={styles.container}>
@@ -40,12 +63,7 @@ const loginScreen: FC = (props: any) => {
                               loading={showSpinnerState}
                               style={styles.signupButton}
                         ></Button>
-                        <Button
-                              title={'Signup'}
-                              mode={'text'}
-                              style={styles.loginButton}
-                              onPress={() => props.navigation.replace('Signup')}
-                        ></Button>
+                        <Button title={'Signup'} mode={'text'} style={styles.loginButton} onPress={() => props.navigation.replace('Signup')}></Button>
                   </ScrollView>
             </BackgroundContainer>
       );
@@ -71,4 +89,18 @@ const styles = StyleSheet.create({
       },
 });
 
-export default loginScreen;
+const mapStateToProps = (state: any) => {
+      return {
+            token: state.token,
+      };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+      return {
+            setToken: (value: string) => {
+                  dispatch({ type: 'SET_TOKEN', value: value });
+            },
+      };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(loginScreen);

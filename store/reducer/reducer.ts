@@ -1,17 +1,21 @@
-import { CoreActions, SOME_ACTION } from '../types';
-
 const initialState = {
-      setCount: 4,
+      token: undefined,
 };
 
-const reducer = (state = initialState, action: CoreActions) => {
-      if (action.type === SOME_ACTION) {
+const reducer = (state = initialState, action: any) => {
+      if (action.type === 'SET_TOKEN') {
             return {
                   ...state,
-                  setCount: action.value,
+                  token: action.value,
             };
+      } else if (action.type === 'REMOVE_TOKEN') {
+            return {
+                  ...state,
+                  token: undefined,
+            };
+      } else {
+            return state;
       }
-      return state;
 };
 
 export default reducer;

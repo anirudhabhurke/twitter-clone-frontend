@@ -4,11 +4,13 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../assets';
 import axios from '../axios';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
+import { connect } from 'react-redux';
 
 interface propTypes {
       tweetId: number;
       setRefreshing: Function;
       refreshing: boolean;
+      token: string;
 }
 
 const AddComment: React.FC<propTypes> = (props) => {
@@ -19,9 +21,13 @@ const AddComment: React.FC<propTypes> = (props) => {
                   setComment('');
                   return;
             } else {
-                  axios.post(`/tweets/${props.tweetId}/new-comment`, {
-                        comment: comment,
-                  })
+                  axios.post(
+                        `/tweets/${props.tweetId}/new-comment`,
+                        {
+                              comment: comment,
+                        },
+                        { headers: { Authorization: `Bearer ${props.token}` } }
+                  )
                         .then((result: any) => {
                               props.setRefreshing(!props.refreshing);
                               setComment('');
@@ -51,8 +57,6 @@ const AddComment: React.FC<propTypes> = (props) => {
             </View>
       );
 };
-
-export default AddComment;
 
 const styles = StyleSheet.create({
       surface: {
@@ -93,3 +97,19 @@ const styles = StyleSheet.create({
             justifyContent: 'center',
       },
 });
+
+const mapStateToProps = (state: any) => {
+      return {
+            token: state.token,
+      };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+      return {
+            setToken: (value: string) => {
+                  dispatch({ type: 'SET_TOKEN', value: value });
+            },
+      };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddComment);

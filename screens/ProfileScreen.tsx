@@ -1,22 +1,24 @@
 import React, { useState, FC } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ToastAndroid } from 'react-native';
 import { Colors, Fonts } from '../assets';
 import { BackgroundContainer } from '../components/containers';
 import { Text, FloatingActionButton, Button } from '../components';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const profileScreen: FC = (props: any) => {
-      const signOut = () => {};
+      const signOut = () => {
+            AsyncStorage.removeItem('token', (err) => {
+                  if (!err) {
+                        ToastAndroid.show('Logged out', ToastAndroid.SHORT);
+                        props.navigation.replace('Auth');
+                  }
+            });
+      };
 
       return (
             <BackgroundContainer style={styles.container}>
                   <Text>I am profile</Text>
-                  <Button
-                        title={'Signout'}
-                        icon={'logout-variant'}
-                        onPress={() => signOut()}
-                        mode={'outlined'}
-                        style={styles.signOutButton}
-                  ></Button>
+                  <Button title={'Signout'} icon={'logout-variant'} onPress={() => signOut()} mode={'outlined'} style={styles.signOutButton}></Button>
                   <FloatingActionButton
                         iconName={'edit'}
                         onPress={() => {

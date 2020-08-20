@@ -7,15 +7,27 @@ import { BackgroundContainer } from '../components/containers';
 import HomeNavigator from './HomeNavigator';
 import { Colors, Fonts } from '../assets';
 import { Loading } from '../components';
+import { connect } from 'react-redux';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const Stack = createStackNavigator();
 
-const mainNavigator = () => {
+const mainNavigator = (props: any) => {
       const [displayScreen, setDisplayScreen] = useState<string | undefined>(undefined);
 
       useEffect(() => {
             // check auth status
-            setDisplayScreen('HomeNav');
+            AsyncStorage.getItem('token', (err, result) => {
+                  if (err) {
+                        return setDisplayScreen('Auth');
+                  }
+                  if (result) {
+                        props.setToken(result);
+                        setDisplayScreen('HomeNav');
+                  } else {
+                        setDisplayScreen('Auth');
+                  }
+            });
       }, []);
 
       const navigationOptions = {
@@ -30,12 +42,12 @@ const mainNavigator = () => {
       return (
             <NavigationContainer>
                   <Stack.Navigator initialRouteName={displayScreen}>
-                        <Stack.Screen name='Auth' component={AuthScreen} options={navigationOptions} />
-                        <Stack.Screen name='Signup' component={SignupScreen} options={navigationOptions} />
-                        <Stack.Screen name='Login' component={LoginScreen} options={navigationOptions} />
-                        <Stack.Screen name='HomeNav' component={HomeNavigator} options={navigationOptions} />
+                        <Stack.Screen name="Auth" component={AuthScreen} options={navigationOptions} />
+                        <Stack.Screen name="Signup" component={SignupScreen} options={navigationOptions} />
+                        <Stack.Screen name="Login" component={LoginScreen} options={navigationOptions} />
+                        <Stack.Screen name="HomeNav" component={HomeNavigator} options={navigationOptions} />
                         <Stack.Screen
-                              name='NewPost'
+                              name="NewPost"
                               component={NewPostScreen}
                               options={{
                                     title: 'New Tweet',
@@ -50,7 +62,7 @@ const mainNavigator = () => {
                               }}
                         />
                         <Stack.Screen
-                              name='TweetDetail'
+                              name="TweetDetail"
                               component={TweetDetailScreen}
                               options={{
                                     title: 'Tweet',
@@ -65,7 +77,7 @@ const mainNavigator = () => {
                               }}
                         />
                         <Stack.Screen
-                              name='EditProfile'
+                              name="EditProfile"
                               component={EditProfileScreen}
                               options={{
                                     title: 'Edit Profile',
@@ -84,4 +96,18 @@ const mainNavigator = () => {
       );
 };
 
-export default mainNavigator;
+const mapStateToProps = (state: any) => {
+      return {
+            token: state.token,
+      };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+      return {
+            setToken: (value: string) => {
+                  dispatch({ type: 'SET_TOKEN', value: value });
+            },
+      };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(mainNavigator);

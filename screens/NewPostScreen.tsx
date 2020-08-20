@@ -4,17 +4,22 @@ import { Button } from 'react-native-paper';
 import { Colors, Fonts } from '../assets';
 import { BackgroundContainer } from '../components/containers';
 import axios from '../axios';
+import { connect } from 'react-redux';
 
-const newPostScreen: FC = (props: any) => {
+const NewPostScreen: FC = (props: any) => {
       const [postState, setPostState] = useState('');
       const [postUploadingState, setPostUploadingState] = useState(false);
 
       const postTweet = () => {
             if (postState.replace(/\s/g, '').length) {
                   setPostUploadingState(true);
-                  axios.post('/tweets', {
-                        content: postState,
-                  })
+                  axios.post(
+                        '/tweets',
+                        {
+                              content: postState,
+                        },
+                        { headers: { Authorization: `Bearer ${props.token}` } }
+                  )
                         .then(() => {
                               props.navigation.goBack();
                         })
@@ -37,8 +42,8 @@ const newPostScreen: FC = (props: any) => {
                   ></TextInput>
                   <Button
                         dark
-                        icon='feather'
-                        mode='contained'
+                        icon="feather"
+                        mode="contained"
                         color={Colors.primary}
                         onPress={() => postTweet()}
                         style={styles.tweetButton}
@@ -73,4 +78,18 @@ const styles = StyleSheet.create({
       },
 });
 
-export default newPostScreen;
+const mapStateToProps = (state: any) => {
+      return {
+            token: state.token,
+      };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+      return {
+            setToken: (value: string) => {
+                  dispatch({ type: 'SET_TOKEN', value: value });
+            },
+      };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewPostScreen);

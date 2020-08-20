@@ -1,6 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, ToastAndroid } from 'react-native';
-
 import { Colors } from '../assets';
 import { BackgroundContainer } from '../components/containers';
 import { Text, Loading } from '../components';
@@ -9,6 +8,7 @@ import { tweetType, commentType } from '../utils';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import AddComment from '../components/AddComment';
 import { Feather } from '@expo/vector-icons';
+import { connect } from 'react-redux';
 
 const TweetDetailScreen: FC = (props: any) => {
       const [tweet, setTweet] = useState<tweetType | null>(null);
@@ -19,7 +19,7 @@ const TweetDetailScreen: FC = (props: any) => {
             const unsubscribe = props.navigation.addListener('focus', () => {
                   const fetchedTweet = props.route.params.tweet;
                   setTweet(fetchedTweet);
-                  axios.get(`/tweets/${fetchedTweet.id}/comments`)
+                  axios.get(`/tweets/${fetchedTweet.id}/comments`, { headers: { Authorization: `Bearer ${props.token}` } })
                         .then((result: any) => {
                               setComments(result.data);
                         })
@@ -30,7 +30,7 @@ const TweetDetailScreen: FC = (props: any) => {
 
       useEffect(() => {
             if (tweet) {
-                  axios.get(`/tweets/${tweet.id}/comments`)
+                  axios.get(`/tweets/${tweet.id}/comments`, { headers: { Authorization: `Bearer ${props.token}` } })
                         .then((result: any) => {
                               setComments(result.data);
                         })
@@ -39,7 +39,7 @@ const TweetDetailScreen: FC = (props: any) => {
       }, [refreshing]);
 
       const likeTweet = () => {
-            axios.patch(`/tweets/${tweet?.id}`)
+            axios.patch(`/tweets/${tweet?.id}`, null, { headers: { Authorization: `Bearer ${props.token}` } })
                   .then((result: any) => {
                         if (result.status === 200) {
                               setTweet((prevTweet) => {
@@ -57,7 +57,7 @@ const TweetDetailScreen: FC = (props: any) => {
                   .catch((error) => console.log(error));
       };
       const deleteTweet = () => {
-            axios.delete(`/tweets/${tweet?.id}`)
+            axios.delete(`/tweets/${tweet?.id}`, { headers: { Authorization: `Bearer ${props.token}` } })
                   .then((result: any) => {
                         if (result.status === 200) {
                               ToastAndroid.show('Deleted', ToastAndroid.SHORT);
@@ -70,7 +70,7 @@ const TweetDetailScreen: FC = (props: any) => {
       };
 
       const deleteComment = (commentId: number) => {
-            axios.delete(`/tweets/${tweet?.id}/delete-comment/${commentId}`)
+            axios.delete(`/tweets/${tweet?.id}/delete-comment/${commentId}`, { headers: { Authorization: `Bearer ${props.token}` } })
                   .then((result: any) => {
                         if (result.status === 200) {
                               ToastAndroid.show('Comment deleted', ToastAndroid.SHORT);
@@ -177,4 +177,18 @@ const styles = StyleSheet.create({
       },
 });
 
-export default TweetDetailScreen;
+const mapStateToProps = (state: any) => {
+      return {
+            token: state.token,
+      };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+      return {
+            setToken: (value: string) => {
+                  dispatch({ type: 'SET_TOKEN', value: value });
+            },
+      };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TweetDetailScreen);

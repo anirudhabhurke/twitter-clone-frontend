@@ -5,13 +5,14 @@ import { FloatingActionButton, Loading } from '../components';
 import axios from '../axios';
 import TweetList from '../components/TweetsList';
 import { tweetType } from '../utils';
+import { connect } from 'react-redux';
 
 const HomeScreen: FC = (props: any) => {
       const [tweets, setTweets] = useState<tweetType[]>([]);
 
       useEffect(() => {
             const unsubscribe = props.navigation.addListener('focus', () => {
-                  axios.get(`/tweets`)
+                  axios.get(`/tweets`, { headers: { Authorization: `Bearer ${props.token}` } })
                         .then((result: any) => {
                               setTweets(result.data.data);
                         })
@@ -45,4 +46,18 @@ const styles = StyleSheet.create({
       },
 });
 
-export default HomeScreen;
+const mapStateToProps = (state: any) => {
+      return {
+            token: state.token,
+      };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+      return {
+            setToken: (value: string) => {
+                  dispatch({ type: 'SET_TOKEN', value: value });
+            },
+      };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
