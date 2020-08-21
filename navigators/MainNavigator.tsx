@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AuthScreen, NewPostScreen, SignupScreen, LoginScreen, EditProfileScreen, TweetDetailScreen } from '../screens';
-import { BackgroundContainer } from '../components/containers';
 import HomeNavigator from './HomeNavigator';
 import { Colors, Fonts } from '../assets';
 import { Loading } from '../components';
@@ -17,12 +15,12 @@ const mainNavigator = (props: any) => {
 
       useEffect(() => {
             // check auth status
-            AsyncStorage.getItem('token', (err, result) => {
+            AsyncStorage.multiGet(['token', 'userId'], (err, result) => {
                   if (err) {
                         return setDisplayScreen('Auth');
                   }
-                  if (result) {
-                        props.setToken(result);
+                  if (result && result[0][1]) {
+                        props.setToken(result[0][1], result[1][1]);
                         setDisplayScreen('HomeNav');
                   } else {
                         setDisplayScreen('Auth');
@@ -96,18 +94,12 @@ const mainNavigator = (props: any) => {
       );
 };
 
-const mapStateToProps = (state: any) => {
-      return {
-            token: state.token,
-      };
-};
-
 const mapDispatchToProps = (dispatch: any) => {
       return {
-            setToken: (value: string) => {
-                  dispatch({ type: 'SET_TOKEN', value: value });
+            setToken: (token: string, userId: number) => {
+                  dispatch({ type: 'SET_TOKEN', token, userId });
             },
       };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(mainNavigator);
+export default connect(null, mapDispatchToProps)(mainNavigator);

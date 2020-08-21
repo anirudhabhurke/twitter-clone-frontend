@@ -49,13 +49,14 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: any) => {
       return {
             token: state.token,
+            userId: state.userId,
       };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
       return {
-            setToken: (value: string) => {
-                  dispatch({ type: 'SET_TOKEN', value: value });
+            setToken: (token: string, userId: number) => {
+                  dispatch({ type: 'SET_TOKEN', token, userId });
             },
       };
 };

@@ -20,15 +20,22 @@ const loginScreen: FC = (props: any) => {
                   };
                   axios.post('/user/login', user).then((response) => {
                         if (response.data.error) {
+                              setShowSpinnerState(false);
                               ToastAndroid.show(response.data.error, ToastAndroid.SHORT);
                         } else if (response.data.message === 'Successful login') {
                               ToastAndroid.show(response.data.message, ToastAndroid.SHORT);
-                              props.setToken(response.data.token);
-                              AsyncStorage.setItem('token', response.data.token, (error) => {
-                                    if (!error) {
-                                          props.navigation.replace('HomeNav');
+                              props.setToken(response.data.token, response.data.userId);
+                              AsyncStorage.multiSet(
+                                    [
+                                          ['token', response.data.token.toString()],
+                                          ['userId', response.data.userId.toString()],
+                                    ],
+                                    (error) => {
+                                          if (!error) {
+                                                props.navigation.replace('HomeNav');
+                                          }
                                     }
-                              });
+                              );
                         }
                   });
             }
@@ -92,13 +99,14 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: any) => {
       return {
             token: state.token,
+            userId: state.userId,
       };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
       return {
-            setToken: (value: string) => {
-                  dispatch({ type: 'SET_TOKEN', value: value });
+            setToken: (token: string, userId: number) => {
+                  dispatch({ type: 'SET_TOKEN', token, userId });
             },
       };
 };

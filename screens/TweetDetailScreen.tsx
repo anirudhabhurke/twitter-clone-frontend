@@ -57,7 +57,7 @@ const TweetDetailScreen: FC = (props: any) => {
                   .catch((error) => console.log(error));
       };
       const deleteTweet = () => {
-            axios.delete(`/tweets/${tweet?.id}`, { headers: { Authorization: `Bearer ${props.token}` } })
+            axios.delete(`/tweets/${tweet?.id}/${props.userId}`, { headers: { Authorization: `Bearer ${props.token}` } })
                   .then((result: any) => {
                         if (result.status === 200) {
                               ToastAndroid.show('Deleted', ToastAndroid.SHORT);
@@ -70,7 +70,7 @@ const TweetDetailScreen: FC = (props: any) => {
       };
 
       const deleteComment = (commentId: number) => {
-            axios.delete(`/tweets/${tweet?.id}/delete-comment/${commentId}`, { headers: { Authorization: `Bearer ${props.token}` } })
+            axios.delete(`/tweets/${tweet?.id}/${props.userId}/delete-comment/${commentId}`, { headers: { Authorization: `Bearer ${props.token}` } })
                   .then((result: any) => {
                         if (result.status === 200) {
                               ToastAndroid.show('Comment deleted', ToastAndroid.SHORT);
@@ -180,15 +180,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: any) => {
       return {
             token: state.token,
+            userId: state.userId,
       };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
-      return {
-            setToken: (value: string) => {
-                  dispatch({ type: 'SET_TOKEN', value: value });
-            },
-      };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(TweetDetailScreen);
+export default connect(mapStateToProps, null)(TweetDetailScreen);

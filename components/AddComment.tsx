@@ -11,6 +11,7 @@ interface propTypes {
       setRefreshing: Function;
       refreshing: boolean;
       token: string;
+      userId: number;
 }
 
 const AddComment: React.FC<propTypes> = (props) => {
@@ -22,7 +23,7 @@ const AddComment: React.FC<propTypes> = (props) => {
                   return;
             } else {
                   axios.post(
-                        `/tweets/${props.tweetId}/new-comment`,
+                        `/tweets/${props.tweetId}/${props.userId}/new-comment`,
                         {
                               comment: comment,
                         },
@@ -101,15 +102,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: any) => {
       return {
             token: state.token,
+            userId: state.userId,
       };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
-      return {
-            setToken: (value: string) => {
-                  dispatch({ type: 'SET_TOKEN', value: value });
-            },
-      };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(AddComment);
+export default connect(mapStateToProps, null)(AddComment);

@@ -14,7 +14,7 @@ const NewPostScreen: FC = (props: any) => {
             if (postState.replace(/\s/g, '').length) {
                   setPostUploadingState(true);
                   axios.post(
-                        '/tweets',
+                        `/tweets/${props.userId}`,
                         {
                               content: postState,
                         },
@@ -81,15 +81,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: any) => {
       return {
             token: state.token,
+            userId: state.userId,
       };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
-      return {
-            setToken: (value: string) => {
-                  dispatch({ type: 'SET_TOKEN', value: value });
-            },
-      };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(NewPostScreen);
+export default connect(mapStateToProps, null)(NewPostScreen);

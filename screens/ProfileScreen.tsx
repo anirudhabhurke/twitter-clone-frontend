@@ -4,10 +4,12 @@ import { Colors, Fonts } from '../assets';
 import { BackgroundContainer } from '../components/containers';
 import { Text, FloatingActionButton, Button } from '../components';
 import AsyncStorage from '@react-native-community/async-storage';
+import { connect } from 'react-redux';
 
 const profileScreen: FC = (props: any) => {
       const signOut = () => {
-            AsyncStorage.removeItem('token', (err) => {
+            props.removeToken();
+            AsyncStorage.multiRemove(['token', 'userId'], (err) => {
                   if (!err) {
                         ToastAndroid.show('Logged out', ToastAndroid.SHORT);
                         props.navigation.replace('Auth');
@@ -38,4 +40,19 @@ const styles = StyleSheet.create({
       },
 });
 
-export default profileScreen;
+const mapStateToProps = (state: any) => {
+      return {
+            token: state.token,
+            userId: state.userId,
+      };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+      return {
+            removeToken: () => {
+                  dispatch({ type: 'REMOVE_TOKEN' });
+            },
+      };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(profileScreen);
