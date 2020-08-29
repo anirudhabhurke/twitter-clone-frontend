@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, ListRenderItem, TouchableNativeFeedback } from 'react-native';
+import { View, StyleSheet, FlatList, ListRenderItem, TouchableNativeFeedback, RefreshControl } from 'react-native';
 import { Colors, Fonts } from '../assets';
 import { Text } from '../components';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -10,6 +10,8 @@ import { tweetType } from '../utils';
 interface propsTypes {
       tweetData: tweetType[];
       navigation?: any;
+      loading: boolean;
+      loadMoreTweets: Function;
 }
 
 const relativeTime = (timestamp: string) => {
@@ -18,14 +20,12 @@ const relativeTime = (timestamp: string) => {
 };
 
 const TweetList: React.FC<propsTypes> = (props) => {
-      if (props.tweetData.length <= 0) {
-            return (
-                  <View style={{ justifyContent: 'center', alignItems: 'center', height: hp(100) }}>
-                        <SimpleLineIcons name={'social-twitter'} color={Colors.primary} size={40}></SimpleLineIcons>
-                        <Text style={styles.emptyTweetsText}>Oh . .. Nothing here</Text>
-                  </View>
-            );
-      }
+      const ListEmptyComponent = (
+            <View style={{ justifyContent: 'center', alignItems: 'center', height: hp(100) }}>
+                  <SimpleLineIcons name={'social-twitter'} color={Colors.primary} size={40}></SimpleLineIcons>
+                  <Text style={styles.emptyTweetsText}>Oh . .. Nothing here</Text>
+            </View>
+      );
 
       return (
             <FlatList<tweetType>
@@ -47,6 +47,12 @@ const TweetList: React.FC<propsTypes> = (props) => {
                               </TouchableNativeFeedback>
                         );
                   }}
+                  refreshControl={<RefreshControl refreshing={props.loading} />}
+                  ListEmptyComponent={ListEmptyComponent}
+                  onEndReached={() => {
+                        props.loadMoreTweets();
+                  }}
+                  onEndReachedThreshold={0.2}
                   keyExtractor={(item) => item.id.toString()}
             />
       );

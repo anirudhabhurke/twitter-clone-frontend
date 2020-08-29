@@ -9,24 +9,44 @@ import { connect } from 'react-redux';
 
 const HomeScreen: FC = (props: any) => {
       const [tweets, setTweets] = useState<tweetType[]>([]);
+      const [pageNo, setPageNo] = useState<number>(1);
+      const [fetchingFromServer, setFetchingFromServer] = useState<boolean>(true);
 
       useEffect(() => {
             const unsubscribe = props.navigation.addListener('focus', () => {
-                  axios.get(`/tweets`, { headers: { Authorization: `Bearer ${props.token}` } })
+                  axios.get(`/tweets/${pageNo}`, { headers: { Authorization: `Bearer ${props.token}` } })
                         .then((result: any) => {
-                              setTweets(result.data.data);
+                              setFetchingFromServer(false);
+                              setPageNo(pageNo + 1);
+                              setTweets([...tweets, ...result.data.data]);
                         })
                         .catch((err: any) => console.log(err));
             });
             return unsubscribe;
       }, [props.navigation]);
 
+      const loadMoreTweets = () => {
+            setFetchingFromServer(true);
+            axios.get(`/tweets/${pageNo}`, { headers: { Authorization: `Bearer ${props.token}` } })
+                  .then((result: any) => {
+                        setFetchingFromServer(false);
+                        setPageNo(pageNo + 1);
+                        setTweets([...tweets, ...result.data.data]);
+                  })
+                  .catch((err: any) => console.log(err));
+      };
+
       if (!tweets) {
             return <Loading></Loading>;
       } else
             return (
                   <BackgroundContainer style={styles.container}>
-                        <TweetList tweetData={tweets} navigation={props.navigation}></TweetList>
+                        <TweetList
+                              tweetData={tweets}
+                              navigation={props.navigation}
+                              loading={fetchingFromServer}
+                              loadMoreTweets={loadMoreTweets}
+                        ></TweetList>
                         <FloatingActionButton
                               iconName={'feather'}
                               onPress={() => {
